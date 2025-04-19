@@ -1,32 +1,106 @@
-<!-- src/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Friendly Foods Check-In</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Friendly Foods Check-In</h1>
-    <form id="checkin-form">
-      <label for="phone">Phone Number:</label>
-      <input type="text" id="phone" name="phone" required />
-      <button type="submit">Check In</button>
-    </form>
+    <h1>Welcome to Friendly Foods</h1>
+    <p>Please enter your phone number to check in:</p>
+    <input type="text" id="phoneInput" placeholder="Enter 10-digit phone number" />
+    <button id="checkInButton">Check In</button>
 
-    <p id="message"></p>
+    <div id="message" style="margin-top: 15px; color: red;"></div>
 
-    <br>
-
-    <!-- New Visitor Registration Button -->
-    <div class="register-link">
-      <h3>New visitor?</h3>
-      <a href="register.html" class="button-link">Register Here</a>
+    <div id="errorModal" class="modal-overlay">
+      <div class="modal-box">
+        <span id="closeModal" class="close-button">&times;</span>
+        <p id="errorMessage"></p>
+      </div>
     </div>
+
+    <p>New here? <a href="register.html">Register</a></p>
   </div>
 
-  <script src="main.js"></script>
+  <script>
+    document.getElementById("checkInButton").addEventListener("click", async () => {
+      const phone = document.getElementById("phoneInput").value.trim();
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = "";
+  
+      if (!phone.match(/^\d{10}$/)) {
+        messageDiv.textContent = "Please enter a valid 10-digit phone number.";
+        return;
+      }
+  
+      try {
+        const response = await fetch("/checkin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ phone }),
+        });
+  
+        const data = await response.json();
+        
+        if (data.status === "CheckedIn") {
+          // Redirect to thank you page with name in query string
+          window.location.href = `thankyou.html?name=${encodeURIComponent(data.name)}`;
+        } else if (data.status === "TooSoon") {
+          showErrorModal(`You already checked in within the last 7 days. You have to wait ${data.daysLeft} day${data.daysLeft > 1 ? 's' : ''} before your next visit.`);
+        } else if (data.status === "NotFound") {
+          showErrorModal("This phone number is not registered.");
+        } else {
+          showErrorModal("Unable to check in. Please try again.");
+        }
+      } catch (err) {
+        showErrorModal("An error occurred while checking in.");
+      }
+    });
+
+    // Function to show the modal with error message
+    /*function showErrorModal(message) {
+  const errorMessage = document.getElementById("errorMessage");
+  const modal = document.getElementById("errorModal");
+
+  errorMessage.textContent = message;
+
+  // Restart the animation by toggling the 'show' class
+  modal.classList.remove("show");
+  void modal.offsetWidth; // Trigger reflow
+  modal.classList.add("show");
+}
+
+// Close the modal when "X" is clicked
+document.getElementById("closeModal").addEventListener("click", () => {
+  const modal = document.getElementById("errorModal");
+  modal.classList.remove("show");
+});*/
+function showErrorModal(message) {
+  const errorMessage = document.getElementById("errorMessage");
+  const modal = document.getElementById("errorModal");
+
+  errorMessage.textContent = message;
+
+  // Ensure the modal is visible by adding 'show' to the overlay
+  modal.classList.remove("show");
+  // Trigger reflow to restart animation
+  void modal.offsetWidth; 
+  modal.classList.add("show"); // This triggers the transition
+
+  // Add event listener for close button (if not already added)
+  const closeButton = document.getElementById("closeModal");
+  closeButton.removeEventListener("click", closeModal); // Remove old listeners to prevent stacking
+  closeButton.addEventListener("click", closeModal);
+
+  function closeModal() {
+    modal.classList.remove("show"); // Remove the 'show' class to close
+  }
+}
+  </script>  
 </body>
 </html>

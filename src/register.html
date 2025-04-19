@@ -1,33 +1,58 @@
-<!-- src/register.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>New Visitor Registration</title>
+  <title>Register - Friendly Foods</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Register as a New Visitor</h1>
-    <form id="registration-form">
-      <label for="reg-name">Full Name:</label>
-      <input type="text" id="reg-name" name="reg-name" required />
+    <h1>New Visitor Registration</h1>
+    <p>Please fill out your details below to register:</p>
 
-      <label for="reg-phone">Phone Number:</label>
-      <input type="text" id="reg-phone" name="reg-phone" required />
+    <input type="text" id="nameInput" placeholder="Full Name" />
+    <input type="text" id="phoneInput" placeholder="10-digit Phone Number" />
+    <button id="registerButton">Register</button>
 
-      <button type="submit">Register</button>
-    </form>
-    <br>
-    <p><a href="index.html">Back to Check-In</a></p>
+    <div id="message" style="margin-top: 15px; color: red;"></div>
+
+    <p>Already registered? <a href="index.html">Check in here</a></p>
   </div>
+
   <script>
-    document.getElementById("registration-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      alert("New visitor registered successfully (simulated)!");
-      // TODO: Connect with database and store registration data.
+    document.getElementById("registerButton").addEventListener("click", async () => {
+      const name = document.getElementById("nameInput").value.trim();
+      const phone = document.getElementById("phoneInput").value.trim();
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = "";
+  
+      if (!name || !phone.match(/^\d{10}$/)) {
+        messageDiv.textContent = "Please enter a valid name and 10-digit phone number.";
+        return;
+      }
+  
+      try {
+        const response = await fetch("/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name, phone })
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && data.success) {
+          window.location.href = `thankyou.html?name=${encodeURIComponent(data.name)}`;
+        } else {
+          messageDiv.textContent = data.message || "Registration failed.";
+        }
+      } catch (err) {
+        console.error("Registration error:", err);
+        messageDiv.textContent = "An error occurred during registration.";
+      }
     });
-  </script>
+  </script>  
 </body>
 </html>

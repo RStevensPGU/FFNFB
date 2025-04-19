@@ -1,29 +1,26 @@
-<!-- src/thankyou.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thank You</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check-In Successful</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <h1 id="thank-you-message">Thank you for checking in!</h1>
-    <br>
-    <p class="center">Your visit has been recorded.</p>
-    <br>
-    <button onclick="window.location.href = 'index.html'">Back to Check-In</button>
+    <h1>Thank You!</h1>
+    <p id="message">You have successfully checked in.</p>
+    <a href="/">Back to Check-In</a>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const name = localStorage.getItem('userName');
-      if (name) {
-        document.getElementById('thank-you-message').textContent = `Thank you for checking in, ${name}!`;
-      }
-    });
+    // Get name from query string
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+
+    if (name) {
+      document.getElementById("message").innerText = `Thanks, ${name}, for checking in!`;
+    }
   </script>
 </body>
 </html>
