@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Friendly Foods Check-In</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Friendly Foods Check-In</h1>
+
+    <!-- Message Display -->
+    <div id="message" class="message"></div>
+
+    <!-- Returning Visitor -->
+    <section class="form-section">
+      <h2>Returning Visitor Check-In</h2>
+      <form id="checkinForm">
+        <label for="checkinPhone">Phone Number:</label>
+        <input type="tel" id="checkinPhone" name="checkinPhone" required />
+        <button type="submit">Check In</button>
+      </form>
+    </section>
+
+    <!-- New Visitor Registration -->
+    <section class="form-section">
+      <h2>New Visitor Registration</h2>
+      <form id="signupForm">
+        <label for="signupName">Full Name:</label>
+        <input type="text" id="signupName" name="signupName" required />
+
+        <label for="signupPhone">Phone Number:</label>
+        <input type="tel" id="signupPhone" name="signupPhone" required />
+
+        <button type="submit">Sign Up</button>
+      </form>
+    </section>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
