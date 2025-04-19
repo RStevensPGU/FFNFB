@@ -1,0 +1,33 @@
+<!-- src/register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>New Visitor Registration</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Register as a New Visitor</h1>
+    <form id="registration-form">
+      <label for="reg-name">Full Name:</label>
+      <input type="text" id="reg-name" name="reg-name" required />
+
+      <label for="reg-phone">Phone Number:</label>
+      <input type="text" id="reg-phone" name="reg-phone" required />
+
+      <button type="submit">Register</button>
+    </form>
+    <br>
+    <p><a href="index.html">Back to Check-In</a></p>
+  </div>
+  <script>
+    document.getElementById("registration-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      alert("New visitor registered successfully (simulated)!");
+      // TODO: Connect with database and store registration data.
+    });
+  </script>
+</body>
+</html>

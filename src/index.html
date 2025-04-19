@@ -1,3 +1,4 @@
+<!-- src/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,33 +10,21 @@
 <body>
   <div class="container">
     <h1>Friendly Foods Check-In</h1>
+    <form id="checkin-form">
+      <label for="phone">Phone Number:</label>
+      <input type="text" id="phone" name="phone" required />
+      <button type="submit">Check In</button>
+    </form>
 
-    <!-- Message Display -->
-    <div id="message" class="message"></div>
+    <p id="message"></p>
 
-    <!-- Returning Visitor -->
-    <section class="form-section">
-      <h2>Returning Visitor Check-In</h2>
-      <form id="checkinForm">
-        <label for="checkinPhone">Phone Number:</label>
-        <input type="tel" id="checkinPhone" name="checkinPhone" required />
-        <button type="submit">Check In</button>
-      </form>
-    </section>
+    <br>
 
-    <!-- New Visitor Registration -->
-    <section class="form-section">
-      <h2>New Visitor Registration</h2>
-      <form id="signupForm">
-        <label for="signupName">Full Name:</label>
-        <input type="text" id="signupName" name="signupName" required />
-
-        <label for="signupPhone">Phone Number:</label>
-        <input type="tel" id="signupPhone" name="signupPhone" required />
-
-        <button type="submit">Sign Up</button>
-      </form>
-    </section>
+    <!-- New Visitor Registration Button -->
+    <div class="register-link">
+      <h3>New visitor?</h3>
+      <a href="register.html" class="button-link">Register Here</a>
+    </div>
   </div>
 
   <script src="main.js"></script>
