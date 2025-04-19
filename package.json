@@ -1,0 +1,18 @@
+{
+  "name": "check-in-app",
+  "version": "1.0.0",
+  "description": "This web-based check-in application is designed for use at the entrance of the Friendly Foods National Food Bank. It ensures that customers only visit once every 7 days. Visitors can check in using their phone number, and new visitors can register.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "live-server src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
