@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login - Friendly Foods</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Login</h1>
+    <input type="text" id="usernameInput" placeholder="Username" />
+    <input type="password" id="passwordInput" placeholder="Password" />
+    <button id="loginButton">Login</button>
+
+    <div id="message" style="margin-top: 15px; color: red;"></div>
+  </div>
+
+  <script>
+    document.getElementById("loginButton").addEventListener("click", async () => {
+      const username = document.getElementById("usernameInput").value.trim();
+      const password = document.getElementById("passwordInput").value.trim();
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = "";
+
+      if (!username || !password) {
+        messageDiv.textContent = "Please enter both username and password.";
+        return;
+      }
+
+      try {
+        const response = await fetch("/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Redirect to the admin dashboard if login is successful
+          window.location.href = "/admin/dashboard";
+        } else {
+          messageDiv.textContent = data.message || "Login failed.";
+        }
+      } catch (err) {
+        console.error("Login error:", err);
+        messageDiv.textContent = "An error occurred during login.";
+      }
+    });
+  </script>
+</body>
+</html>

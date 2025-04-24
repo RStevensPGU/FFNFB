@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="container">
+    <button class="admin-log-in" onclick="window.location.href='/adminLogin.html'">Admin Login</button>
     <h1>Welcome to Friendly Foods</h1>
     <p>Please enter your phone number to check in:</p>
     <input type="text" id="phoneInput" placeholder="Enter 10-digit phone number" />
@@ -62,24 +63,7 @@
       }
     });
 
-    // Function to show the modal with error message
-    /*function showErrorModal(message) {
-  const errorMessage = document.getElementById("errorMessage");
-  const modal = document.getElementById("errorModal");
-
-  errorMessage.textContent = message;
-
-  // Restart the animation by toggling the 'show' class
-  modal.classList.remove("show");
-  void modal.offsetWidth; // Trigger reflow
-  modal.classList.add("show");
-}
-
-// Close the modal when "X" is clicked
-document.getElementById("closeModal").addEventListener("click", () => {
-  const modal = document.getElementById("errorModal");
-  modal.classList.remove("show");
-});*/
+// Function to show the modal with error message
 function showErrorModal(message) {
   const errorMessage = document.getElementById("errorMessage");
   const modal = document.getElementById("errorModal");

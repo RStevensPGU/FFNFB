@@ -21,7 +21,7 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
   
-  h1, h2 {
+  h1, h2, h3 {
     text-align: center;
     margin-bottom: 20px;
     color: #006837;
@@ -38,7 +38,8 @@
   }
   
   input[type="text"],
-  input[type="tel"] {
+  input[type="tel"],
+  input[type="password"] {
     width: 100%;
     padding: 12px;
     margin-top: 5px;
@@ -65,6 +66,13 @@
     background-color: #218838;
   }
   
+  .admin-log-in {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 15%;
+  }
+
   .button-link {
     display: inline-block;
     padding: 10px 15px;
@@ -195,6 +203,7 @@
 }
 
 p {
+  text-align: center;
   font-size: 16px;
   margin: 0;
   padding: 10px 0;

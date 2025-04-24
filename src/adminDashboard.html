@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Friendly Foods</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    
+    <div>
+      <h3>Visits Today (UTC)</h3>
+      <p id="visitsToday">Loading...</p>
+    </div>
+
+    <div>
+      <h3>New Registrations Today (UTC)</h3>
+      <p id="newRegistrations">Loading...</p>
+    </div>
+
+    <div>
+      <h3>Visitor Count for the Last 7 Days (UTC)</h3>
+      <canvas id="visitsChart"></canvas>
+    </div>
+
+    <div>
+      <h3>Search Visitor</h3>
+      <input type="text" id="searchInput" placeholder="Search by Name or Phone" />
+      <button id="searchButton">Search</button>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <script>
+    async function loadDashboardData() {
+      try {
+        const response = await fetch("/admin/dashboard-data");
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Display Visits Today
+          document.getElementById("visitsToday").innerText = data.visitsToday;
+
+          // Display New Registrations Today
+          document.getElementById("newRegistrations").innerText = data.newRegistrations;
+
+          // Render Bar Chart
+          const ctx = document.getElementById("visitsChart").getContext("2d");
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: data.last7Days.map(day => day.date),
+              datasets: [{
+                label: 'Total Visits',
+                data: data.last7Days.map(day => day.totalVisits),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Dashboard data load error:", err);
+      }
+    }
+
+    // Search Functionality
+    document.getElementById('searchButton').addEventListener('click', async () => {
+      const query = document.getElementById('searchInput').value;  // Get the search term from the input field
+      if (!query) {
+        document.getElementById('searchResults').innerHTML = "<p>Please enter a search term.</p>";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/search?query=${encodeURIComponent(query)}`);  // Make the request to the search route
+        const visitors = await response.json();
+        
+        if (visitors.length === 0) {
+          document.getElementById('searchResults').innerHTML = "<p>No visitors found.</p>";
+        } else {
+          // Display search results
+          const resultsContainer = document.getElementById('searchResults');
+          resultsContainer.innerHTML = "";  // Clear previous results
+
+          visitors.forEach(visitor => {
+            const visitorDiv = document.createElement('div');
+            visitorDiv.innerHTML = `
+              <p><strong>Name:</strong> ${visitor.FullName}</p>
+              <p><strong>Phone:</strong> ${visitor.PhoneNumber}</p>
+              <p><strong>Last Visit:</strong> ${new Date(visitor.CreatedAt).toLocaleString()}</p>
+              <hr />
+            `;
+            resultsContainer.appendChild(visitorDiv);
+          });
+        }
+      } catch (err) {
+        console.error('Error searching for visitors:', err);
+        document.getElementById('searchResults').innerHTML = "<p>Error occurred while searching. Please try again later.</p>";
+      }
+    });
+
+    loadDashboardData();
+  </script>
+</body>
+</html>
