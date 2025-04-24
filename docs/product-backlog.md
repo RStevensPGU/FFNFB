@@ -20,6 +20,8 @@
   - Show message if not eligible
 - Log check-in timestamp to database
 
+# Product Backlog – Sprint 2
+
 ## User Story 3: Admin Login & Dashboard
 **Work Items:**
 - Build `/admin-login.html` UI
