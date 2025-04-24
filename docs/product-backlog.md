@@ -19,3 +19,15 @@
   - Allow check-in if > 7 days
   - Show message if not eligible
 - Log check-in timestamp to database
+
+## User Story 3: Admin Login & Dashboard
+**Work Items:**
+- Build `/admin-login.html` UI
+- Create session-based login check
+
+## User Story 4: Search Visitor History
+**Work Items:**
+- Display daily metrics in dashboard
+- Implement 7-day chart using Chart.js
+- Build search feature and display results
+- Style admin dashboard for responsiveness
