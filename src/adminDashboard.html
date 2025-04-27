@@ -112,6 +112,20 @@
     });
 
     loadDashboardData();
+
+    let timeout;
+
+    function resetTimer() {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        alert("Session expired due to inactivity. Redirecting to login.");
+        window.location.href = "/adminLogin.html";
+      }, 20000); // 5 minutes
+    }
+
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeydown = resetTimer;
   </script>
 </body>
 </html>
