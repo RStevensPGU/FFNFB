@@ -24,12 +24,24 @@
 
 ## User Story 3: Admin Login & Dashboard
 **Work Items:**
-- Build `/admin-login.html` UI
-- Create session-based login check
-
-## User Story 4: Search Visitor History
-**Work Items:**
 - Display daily metrics in dashboard
 - Implement 7-day chart using Chart.js
 - Build search feature and display results
 - Style admin dashboard for responsiveness
+
+## User Story 4: Search Visitor History
+**Work Items:**
+- Build `/adminLogin.html` UI
+- Create session-based login check
+
+#Product Backlog - Sprint 3
+
+### User Story 5: Prevent Check-in Within 7 Days  
+**Work Items:**
+- Track and calculate last visit vs. current date (1 pt)  
+- Display message with remaining wait time if restricted (1 pt)
+
+### User Story 6: Session Timeout / Auto-Logout  
+**Work Items:**  
+- Implement session timeout logic (1 pt)  
+- Auto-redirect to login screen (1 pt)
