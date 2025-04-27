@@ -34,7 +34,7 @@
 - Build `/adminLogin.html` UI
 - Create session-based login check
 
-#Product Backlog - Sprint 3
+# Product Backlog - Sprint 3
 
 ### User Story 5: Prevent Check-in Within 7 Days  
 **Work Items:**
