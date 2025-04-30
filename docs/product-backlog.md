@@ -45,3 +45,14 @@
 **Work Items:**  
 - Implement session timeout logic (1 pt)  
 - Auto-redirect to login screen (1 pt)
+
+# Product Backlog - Sprint 4
+
+### User Story 7: Multilingual Support 
+**Work Items:**
+- Add language selector toggle (1 pt)  
+- Translate key UI labels to Spanish (1 pt)
+
+### User Story 8: Final UI Enhancement 
+**Work Items:**  
+- Finalize UI with mobile responsiveness (1 pt)
