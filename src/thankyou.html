@@ -7,21 +7,56 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Language Selector -->
+  <div style="text-align:left; margin: 10px;">
+    <label for="langSelect">Language:</label>
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+  
   <div class="container">
     <button class="admin-log-in" onclick="window.location.href='/adminLogin.html'">Admin Login</button>
-    <h1>Thank You!</h1>
+    
+    <h1 id="thankYouHeading">Thank You!</h1>
     <p id="message">You have successfully checked in.</p>
-    <a href="/">Back to Check-In</a>
+    <a id="backLink" href="/">Back to Check-In</a>
   </div>
 
   <script>
-    // Get name from query string
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get("name");
+    const translations = {
+      en: {
+        thankYouHeading: "Thank You!",
+        successMessage: (name) => `Thanks, ${name}, for checking in!`,
+        defaultMessage: "You have successfully checked in.",
+        backLink: "Back to Check-In"
+      },
+      es: {
+        thankYouHeading: "¡Gracias!",
+        successMessage: (name) => `¡Gracias, ${name}, por registrarte!`,
+        defaultMessage: "Te has registrado con éxito.",
+        backLink: "Volver al registro"
+      }
+    };
 
-    if (name) {
-      document.getElementById("message").innerText = `Thanks, ${name}, for checking in!`;
+    function setLanguage(lang) {
+      localStorage.setItem("language", lang);
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name");
+
+      document.getElementById("thankYouHeading").textContent = translations[lang].thankYouHeading;
+      document.getElementById("backLink").textContent = translations[lang].backLink;
+      
+      const message = name ? translations[lang].successMessage(name) : translations[lang].defaultMessage;
+      document.getElementById("message").textContent = message;
     }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const selectedLang = localStorage.getItem("language") || "en";
+      document.getElementById("langSelect").value = selectedLang;
+      setLanguage(selectedLang);
+    });
   </script>
 </body>
 </html>

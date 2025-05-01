@@ -7,10 +7,20 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Language Selector -->
+  <div style="text-align:left; margin: 10px;">
+    <label for="langSelect">Language:</label>
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+  
   <div class="container">
     <button class="admin-log-in" onclick="window.location.href='/adminLogin.html'">Admin Login</button>
-    <h1>New Visitor Registration</h1>
-    <p>Please fill out your details below to register:</p>
+    
+    <h1 id="registrationHeading">New Visitor Registration</h1>
+    <p id="instructionText">Please fill out your details below to register:</p>
 
     <input type="text" id="nameInput" placeholder="Full Name" />
     <input type="text" id="phoneInput" placeholder="10-digit Phone Number" />
@@ -18,21 +28,71 @@
 
     <div id="message" style="margin-top: 15px; color: red;"></div>
 
-    <p>Already registered? <a href="index.html">Check in here</a></p>
+    <p id="checkInPrompt">Already registered? <a href="index.html">Check in here</a></p>
   </div>
 
+  <!-- Translation Script -->
+  <script>
+    const translations = {
+      en: {
+        registrationHeading: "New Visitor Registration",
+        instructionText: "Please fill out your details below to register:",
+        namePlaceholder: "Full Name",
+        phonePlaceholder: "10-digit Phone Number",
+        registerButton: "Register",
+        checkInPrompt: `Already registered? <a href="index.html">Check in here</a>`,
+        errors: {
+          invalid: "Please enter a valid name and 10-digit phone number.",
+          failed: "Registration failed.",
+          errorOccurred: "An error occurred during registration."
+        }
+      },
+      es: {
+        registrationHeading: "Registro de Nuevo Visitante",
+        instructionText: "Por favor complete sus datos para registrarse:",
+        namePlaceholder: "Nombre completo",
+        phonePlaceholder: "Número de teléfono de 10 dígitos",
+        registerButton: "Registrarse",
+        checkInPrompt: `¿Ya estás registrado? <a href="index.html">Regístrate aquí</a>`,
+        errors: {
+          invalid: "Por favor ingrese un nombre válido y un número de teléfono de 10 dígitos.",
+          failed: "El registro falló.",
+          errorOccurred: "Ocurrió un error durante el registro."
+        }
+      }
+    };
+
+    function setLanguage(lang) {
+      localStorage.setItem("language", lang);
+      document.getElementById("registrationHeading").textContent = translations[lang].registrationHeading;
+      document.getElementById("instructionText").textContent = translations[lang].instructionText;
+      document.getElementById("nameInput").placeholder = translations[lang].namePlaceholder;
+      document.getElementById("phoneInput").placeholder = translations[lang].phonePlaceholder;
+      document.getElementById("registerButton").textContent = translations[lang].registerButton;
+      document.getElementById("checkInPrompt").innerHTML = translations[lang].checkInPrompt;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const selectedLang = localStorage.getItem("language") || "en";
+      document.getElementById("langSelect").value = selectedLang;
+      setLanguage(selectedLang);
+    });
+  </script>
+
+  <!-- Registration Logic -->
   <script>
     document.getElementById("registerButton").addEventListener("click", async () => {
+      const lang = localStorage.getItem("language") || "en";
       const name = document.getElementById("nameInput").value.trim();
       const phone = document.getElementById("phoneInput").value.trim();
       const messageDiv = document.getElementById("message");
       messageDiv.textContent = "";
-  
+
       if (!name || !phone.match(/^\d{10}$/)) {
-        messageDiv.textContent = "Please enter a valid name and 10-digit phone number.";
+        messageDiv.textContent = translations[lang].errors.invalid;
         return;
       }
-  
+
       try {
         const response = await fetch("/register", {
           method: "POST",
@@ -41,19 +101,19 @@
           },
           body: JSON.stringify({ name, phone })
         });
-  
+
         const data = await response.json();
-  
+
         if (response.ok && data.success) {
           window.location.href = `thankyou.html?name=${encodeURIComponent(data.name)}`;
         } else {
-          messageDiv.textContent = data.message || "Registration failed.";
+          messageDiv.textContent = data.message || translations[lang].errors.failed;
         }
       } catch (err) {
         console.error("Registration error:", err);
-        messageDiv.textContent = "An error occurred during registration.";
+        messageDiv.textContent = translations[lang].errors.errorOccurred;
       }
     });
-  </script>  
+  </script>
 </body>
 </html>

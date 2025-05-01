@@ -7,15 +7,28 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Language Selector -->
+  <div style="text-align:left; margin: 10px;">
+    <label for="langSelect">Language:</label>
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+  
+  <!-- Main UI -->
   <div class="container">
     <button class="admin-log-in" onclick="window.location.href='/adminLogin.html'">Admin Login</button>
-    <h1>Welcome to Friendly Foods</h1>
-    <p>Please enter your phone number to check in:</p>
+    
+    <h1 id="welcomeHeading">Welcome to Friendly Foods</h1>
+    <p id="instructionText">Please enter your phone number to check in:</p>
+    
     <input type="text" id="phoneInput" placeholder="Enter 10-digit phone number" />
     <button id="checkInButton">Check In</button>
 
     <div id="message" style="margin-top: 15px; color: red;"></div>
 
+    <!-- Error Modal -->
     <div id="errorModal" class="modal-overlay">
       <div class="modal-box">
         <span id="closeModal" class="close-button">&times;</span>
@@ -23,20 +36,72 @@
       </div>
     </div>
 
-    <p>New here? <a href="register.html">Register</a></p>
+    <p id="newVisitorPrompt">New here? <a id="registerLink" href="register.html">Register</a></p>
   </div>
 
+  <!-- Language Translations Script -->
+  <script>
+    const translations = {
+      en: {
+        welcomeHeading: "Welcome to Friendly Foods",
+        instructionText: "Please enter your phone number to check in:",
+        phonePlaceholder: "Enter 10-digit phone number",
+        checkInButton: "Check In",
+        newVisitorPrompt: `New here? <a id="registerLink" href="register.html">Register</a>`,
+        errors: {
+          invalidPhone: "Please enter a valid 10-digit phone number.",
+          notFound: "This phone number is not registered.",
+          tooSoon: (daysLeft) => `You already checked in within the last 7 days. You have to wait ${daysLeft} day${daysLeft > 1 ? 's' : ''} before your next visit.`,
+          generic: "Unable to check in. Please try again.",
+          errorOccurred: "An error occurred while checking in."
+        }
+      },
+      es: {
+        welcomeHeading: "Bienvenido a Friendly Foods",
+        instructionText: "Por favor, ingrese su número de teléfono para registrarse:",
+        phonePlaceholder: "Ingrese un número de teléfono de 10 dígitos",
+        checkInButton: "Registrar entrada",
+        newVisitorPrompt: `¿Nuevo aquí? <a id="registerLink" href="register.html">Registrarse</a>`,
+        errors: {
+          invalidPhone: "Por favor ingrese un número de teléfono válido de 10 dígitos.",
+          notFound: "Este número de teléfono no está registrado.",
+          tooSoon: (daysLeft) => `Ya se registró en los últimos 7 días. Debe esperar ${daysLeft} día${daysLeft > 1 ? 's' : ''} antes de su próxima visita.`,
+          generic: "No se pudo registrar. Por favor, inténtelo de nuevo.",
+          errorOccurred: "Ocurrió un error al registrarse."
+        }
+      }
+    };
+
+    function setLanguage(lang) {
+      localStorage.setItem("language", lang);
+
+      document.getElementById("welcomeHeading").textContent = translations[lang].welcomeHeading;
+      document.getElementById("instructionText").textContent = translations[lang].instructionText;
+      document.getElementById("phoneInput").placeholder = translations[lang].phonePlaceholder;
+      document.getElementById("checkInButton").textContent = translations[lang].checkInButton;
+      document.getElementById("newVisitorPrompt").innerHTML = translations[lang].newVisitorPrompt;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const selectedLang = localStorage.getItem("language") || "en";
+      document.getElementById("langSelect").value = selectedLang;
+      setLanguage(selectedLang);
+    });
+  </script>
+
+  <!-- Check-In Logic Script -->
   <script>
     document.getElementById("checkInButton").addEventListener("click", async () => {
+      const lang = localStorage.getItem("language") || "en";
       const phone = document.getElementById("phoneInput").value.trim();
       const messageDiv = document.getElementById("message");
       messageDiv.textContent = "";
-  
+
       if (!phone.match(/^\d{10}$/)) {
-        messageDiv.textContent = "Please enter a valid 10-digit phone number.";
+        messageDiv.textContent = translations[lang].errors.invalidPhone;
         return;
       }
-  
+
       try {
         const response = await fetch("/checkin", {
           method: "POST",
@@ -45,46 +110,40 @@
           },
           body: JSON.stringify({ phone }),
         });
-  
+
         const data = await response.json();
         
         if (data.status === "CheckedIn") {
-          // Redirect to thank you page with name in query string
           window.location.href = `thankyou.html?name=${encodeURIComponent(data.name)}`;
         } else if (data.status === "TooSoon") {
-          showErrorModal(`You already checked in within the last 7 days. You have to wait ${data.daysLeft} day${data.daysLeft > 1 ? 's' : ''} before your next visit.`);
+          showErrorModal(translations[lang].errors.tooSoon(data.daysLeft));
         } else if (data.status === "NotFound") {
-          showErrorModal("This phone number is not registered.");
+          showErrorModal(translations[lang].errors.notFound);
         } else {
-          showErrorModal("Unable to check in. Please try again.");
+          showErrorModal(translations[lang].errors.generic);
         }
       } catch (err) {
-        showErrorModal("An error occurred while checking in.");
+        showErrorModal(translations[lang].errors.errorOccurred);
       }
     });
 
-// Function to show the modal with error message
-function showErrorModal(message) {
-  const errorMessage = document.getElementById("errorMessage");
-  const modal = document.getElementById("errorModal");
+    function showErrorModal(message) {
+      const errorMessage = document.getElementById("errorMessage");
+      const modal = document.getElementById("errorModal");
 
-  errorMessage.textContent = message;
+      errorMessage.textContent = message;
+      modal.classList.remove("show");
+      void modal.offsetWidth;
+      modal.classList.add("show");
 
-  // Ensure the modal is visible by adding 'show' to the overlay
-  modal.classList.remove("show");
-  // Trigger reflow to restart animation
-  void modal.offsetWidth; 
-  modal.classList.add("show"); // This triggers the transition
+      const closeButton = document.getElementById("closeModal");
+      closeButton.removeEventListener("click", closeModal);
+      closeButton.addEventListener("click", closeModal);
 
-  // Add event listener for close button (if not already added)
-  const closeButton = document.getElementById("closeModal");
-  closeButton.removeEventListener("click", closeModal); // Remove old listeners to prevent stacking
-  closeButton.addEventListener("click", closeModal);
-
-  function closeModal() {
-    modal.classList.remove("show"); // Remove the 'show' class to close
-  }
-}
-  </script>  
+      function closeModal() {
+        modal.classList.remove("show");
+      }
+    }
+  </script>
 </body>
 </html>

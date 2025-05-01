@@ -7,8 +7,17 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- Language Selector -->
+  <div style="text-align:left; margin: 10px;">
+    <label for="langSelect">Language:</label>
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+  
   <div class="container">
-    <h1>Admin Login</h1>
+    <h1 id="adminLoginHeading">Admin Login</h1>
     <input type="text" id="usernameInput" placeholder="Username" />
     <input type="password" id="passwordInput" placeholder="Password" />
     <button id="loginButton">Login</button>
@@ -17,14 +26,54 @@
   </div>
 
   <script>
+    const translations = {
+      en: {
+        heading: "Admin Login",
+        username: "Username",
+        password: "Password",
+        login: "Login",
+        emptyFields: "Please enter both username and password.",
+        loginFailed: "Login failed.",
+        errorOccurred: "An error occurred during login."
+      },
+      es: {
+        heading: "Inicio de sesión de administrador",
+        username: "Nombre de usuario",
+        password: "Contraseña",
+        login: "Iniciar sesión",
+        emptyFields: "Por favor, introduce el nombre de usuario y la contraseña.",
+        loginFailed: "Error de inicio de sesión.",
+        errorOccurred: "Se produjo un error durante el inicio de sesión."
+      }
+    };
+
+    function setLanguage(lang) {
+      localStorage.setItem("language", lang);
+      const t = translations[lang];
+
+      document.getElementById("adminLoginHeading").textContent = t.heading;
+      document.getElementById("usernameInput").placeholder = t.username;
+      document.getElementById("passwordInput").placeholder = t.password;
+      document.getElementById("loginButton").textContent = t.login;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const lang = localStorage.getItem("language") || "en";
+      document.getElementById("langSelect").value = lang;
+      setLanguage(lang);
+    });
+
     document.getElementById("loginButton").addEventListener("click", async () => {
       const username = document.getElementById("usernameInput").value.trim();
       const password = document.getElementById("passwordInput").value.trim();
       const messageDiv = document.getElementById("message");
+      const lang = localStorage.getItem("language") || "en";
+      const t = translations[lang];
+
       messageDiv.textContent = "";
 
       if (!username || !password) {
-        messageDiv.textContent = "Please enter both username and password.";
+        messageDiv.textContent = t.emptyFields;
         return;
       }
 
@@ -40,14 +89,13 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-          // Redirect to the admin dashboard if login is successful
           window.location.href = "/admin/dashboard";
         } else {
-          messageDiv.textContent = data.message || "Login failed.";
+          messageDiv.textContent = data.message || t.loginFailed;
         }
       } catch (err) {
         console.error("Login error:", err);
-        messageDiv.textContent = "An error occurred during login.";
+        messageDiv.textContent = t.errorOccurred;
       }
     });
   </script>

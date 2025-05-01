@@ -8,26 +8,35 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
+  <!-- Language Selector -->
+  <div style="text-align:left; margin: 10px;">
+    <label for="langSelect">Language:</label>
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+  
   <div class="container">
-    <h1>Admin Dashboard</h1>
+    <h1 id="dashboardTitle">Admin Dashboard</h1>
     
     <div>
-      <h3>Visits Today (UTC)</h3>
+      <h3 id="visitsTodayHeading">Visits Today (UTC)</h3>
       <p id="visitsToday">Loading...</p>
     </div>
 
     <div>
-      <h3>New Registrations Today (UTC)</h3>
+      <h3 id="registrationsTodayHeading">New Registrations Today (UTC)</h3>
       <p id="newRegistrations">Loading...</p>
     </div>
 
     <div>
-      <h3>Visitor Count for the Last 7 Days (UTC)</h3>
+      <h3 id="last7DaysHeading">Visitor Count for the Last 7 Days (UTC)</h3>
       <canvas id="visitsChart"></canvas>
     </div>
 
     <div>
-      <h3>Search Visitor</h3>
+      <h3 id="searchVisitorHeading">Search Visitor</h3>
       <input type="text" id="searchInput" placeholder="Search by Name or Phone" />
       <button id="searchButton">Search</button>
       <div id="searchResults"></div>
@@ -35,19 +44,70 @@
   </div>
 
   <script>
+    const translations = {
+      en: {
+        dashboard: "Admin Dashboard",
+        visitsToday: "Visits Today (UTC)",
+        registrationsToday: "New Registrations Today (UTC)",
+        last7Days: "Visitor Count for the Last 7 Days (UTC)",
+        searchVisitor: "Search Visitor",
+        searchPlaceholder: "Search by Name or Phone",
+        search: "Search",
+        noSearchTerm: "Please enter a search term.",
+        noVisitors: "No visitors found.",
+        searchError: "Error occurred while searching. Please try again later.",
+        name: "Name",
+        phone: "Phone",
+        lastVisit: "Last Visit",
+        sessionExpired: "Session expired due to inactivity. Redirecting to login."
+      },
+      es: {
+        dashboard: "Panel de administrador",
+        visitsToday: "Visitas de hoy (UTC)",
+        registrationsToday: "Nuevos registros hoy (UTC)",
+        last7Days: "Cantidad de visitantes en los últimos 7 días (UTC)",
+        searchVisitor: "Buscar visitante",
+        searchPlaceholder: "Buscar por nombre o teléfono",
+        search: "Buscar",
+        noSearchTerm: "Por favor, introduce un término de búsqueda.",
+        noVisitors: "No se encontraron visitantes.",
+        searchError: "Se produjo un error al buscar. Por favor, inténtalo de nuevo más tarde.",
+        name: "Nombre",
+        phone: "Teléfono",
+        lastVisit: "Última visita",
+        sessionExpired: "Sesión caducada por inactividad. Redirigiendo al inicio de sesión."
+      }
+    };
+
+    function setLanguage(lang) {
+      localStorage.setItem("language", lang);
+      const t = translations[lang];
+
+      document.getElementById("dashboardTitle").textContent = t.dashboard;
+      document.getElementById("visitsTodayHeading").textContent = t.visitsToday;
+      document.getElementById("registrationsTodayHeading").textContent = t.registrationsToday;
+      document.getElementById("last7DaysHeading").textContent = t.last7Days;
+      document.getElementById("searchVisitorHeading").textContent = t.searchVisitor;
+      document.getElementById("searchInput").placeholder = t.searchPlaceholder;
+      document.getElementById("searchButton").textContent = t.search;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const lang = localStorage.getItem("language") || "en";
+      document.getElementById("langSelect").value = lang;
+      setLanguage(lang);
+      loadDashboardData();
+    });
+
     async function loadDashboardData() {
       try {
         const response = await fetch("/admin/dashboard-data");
         const data = await response.json();
         
         if (response.ok) {
-          // Display Visits Today
           document.getElementById("visitsToday").innerText = data.visitsToday;
-
-          // Display New Registrations Today
           document.getElementById("newRegistrations").innerText = data.newRegistrations;
 
-          // Render Bar Chart
           const ctx = document.getElementById("visitsChart").getContext("2d");
           new Chart(ctx, {
             type: "bar",
@@ -75,31 +135,32 @@
       }
     }
 
-    // Search Functionality
     document.getElementById('searchButton').addEventListener('click', async () => {
-      const query = document.getElementById('searchInput').value;  // Get the search term from the input field
+      const query = document.getElementById('searchInput').value.trim();
+      const lang = localStorage.getItem("language") || "en";
+      const t = translations[lang];
+
       if (!query) {
-        document.getElementById('searchResults').innerHTML = "<p>Please enter a search term.</p>";
+        document.getElementById('searchResults').innerHTML = `<p>${t.noSearchTerm}</p>`;
         return;
       }
 
       try {
-        const response = await fetch(`/search?query=${encodeURIComponent(query)}`);  // Make the request to the search route
+        const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
         const visitors = await response.json();
         
-        if (visitors.length === 0) {
-          document.getElementById('searchResults').innerHTML = "<p>No visitors found.</p>";
-        } else {
-          // Display search results
-          const resultsContainer = document.getElementById('searchResults');
-          resultsContainer.innerHTML = "";  // Clear previous results
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = "";
 
+        if (visitors.length === 0) {
+          resultsContainer.innerHTML = `<p>${t.noVisitors}</p>`;
+        } else {
           visitors.forEach(visitor => {
             const visitorDiv = document.createElement('div');
             visitorDiv.innerHTML = `
-              <p><strong>Name:</strong> ${visitor.FullName}</p>
-              <p><strong>Phone:</strong> ${visitor.PhoneNumber}</p>
-              <p><strong>Last Visit:</strong> ${new Date(visitor.CreatedAt).toLocaleString()}</p>
+              <p><strong>${t.name}:</strong> ${visitor.FullName}</p>
+              <p><strong>${t.phone}:</strong> ${visitor.PhoneNumber}</p>
+              <p><strong>${t.lastVisit}:</strong> ${new Date(visitor.CreatedAt).toLocaleString()}</p>
               <hr />
             `;
             resultsContainer.appendChild(visitorDiv);
@@ -107,20 +168,19 @@
         }
       } catch (err) {
         console.error('Error searching for visitors:', err);
-        document.getElementById('searchResults').innerHTML = "<p>Error occurred while searching. Please try again later.</p>";
+        document.getElementById('searchResults').innerHTML = `<p>${t.searchError}</p>`;
       }
     });
 
-    loadDashboardData();
-
     let timeout;
-
     function resetTimer() {
       clearTimeout(timeout);
+      const lang = localStorage.getItem("language") || "en";
+      const t = translations[lang];
       timeout = setTimeout(() => {
-        alert("Session expired due to inactivity. Redirecting to login.");
+        alert(t.sessionExpired);
         window.location.href = "/adminLogin.html";
-      }, 20000); // 5 minutes
+      }, 300000); // 5 minutes = 300,000 ms
     }
 
     window.onload = resetTimer;
